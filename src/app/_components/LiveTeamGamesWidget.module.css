@@ -1,0 +1,178 @@
+.widget {
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: var(--sp-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.label {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--accent);
+  letter-spacing: 0.1em;
+}
+
+.teamToggle {
+  display: flex;
+  gap: 2px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 2px;
+}
+
+.teamBtn {
+  padding: 2px var(--sp-2);
+  border-radius: 2px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 500;
+  color: var(--text-muted);
+  background: transparent;
+  cursor: pointer;
+  transition: background var(--transition-fast), color var(--transition-fast);
+  border: none;
+}
+
+.teamBtnA {
+  background: rgba(34, 197, 94, 0.15);
+  color: var(--accent);
+}
+
+.teamBtnB {
+  background: rgba(96, 165, 250, 0.15);
+  color: #60a5fa;
+}
+
+.coordRow {
+  display: grid;
+  gap: 2px;
+  padding-left: 0;
+}
+
+.coordLabel {
+  font-family: var(--font-mono);
+  font-size: 8px;
+  color: var(--text-muted);
+  text-align: center;
+}
+
+.grid {
+  display: grid;
+  gap: 2px;
+}
+
+.cell {
+  aspect-ratio: 1;
+  background: var(--bg);
+  border: 1px solid var(--border-subtle);
+  border-radius: 2px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background var(--transition-fast), border-color var(--transition-fast);
+}
+
+.cell:hover {
+  background: var(--surface);
+  border-color: var(--border);
+}
+
+.cellOccupied {
+  background: var(--surface);
+}
+
+.cellSelected {
+  border-color: var(--accent) !important;
+  background: var(--accent-dim) !important;
+}
+
+.pin {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 2px;
+  font-family: var(--font-mono);
+  font-size: 8px;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  transition: transform var(--transition-fast);
+}
+
+.pinA {
+  background: rgba(34, 197, 94, 0.2);
+  color: var(--accent);
+  border: 1px solid var(--accent-border);
+}
+
+.pinB {
+  background: rgba(96, 165, 250, 0.15);
+  color: #60a5fa;
+  border: 1px solid rgba(96, 165, 250, 0.3);
+}
+
+.pinSelected {
+  transform: scale(1.1);
+}
+
+.statusRow {
+  padding: var(--sp-2) var(--sp-3);
+  background: var(--bg);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+}
+
+.statusText {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--text-muted);
+}
+
+.actions {
+  display: flex;
+  gap: var(--sp-2);
+  justify-content: flex-end;
+}
+
+.removeBtn {
+  padding: 4px var(--sp-3);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.2);
+  color: #ef4444;
+  cursor: pointer;
+  transition: background var(--transition-fast);
+}
+.removeBtn:hover { background: rgba(239, 68, 68, 0.18); }
+
+.resetBtn {
+  padding: 4px var(--sp-3);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: color var(--transition-fast), border-color var(--transition-fast);
+}
+.resetBtn:hover { color: var(--text-secondary); border-color: var(--text-muted); }
