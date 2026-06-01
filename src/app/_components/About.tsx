@@ -54,7 +54,7 @@ export default function About() {
               <div className="rounded-xl bg-[#080B12] border border-indigo-500/15 flex p-6 flex-col items-center gap-3 relative overflow-hidden">
                 <div className="size-20 rounded-full border border-indigo-500/30 overflow-hidden relative group">
                   <img
-                    src="/DSC_9812.jpg"
+                    src="/avatar_optimized.jpg"
                     alt="Khawaja Fashi"
                     className="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-500 scale-105 hover:scale-110"
                   />

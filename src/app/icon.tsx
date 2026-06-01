@@ -13,7 +13,7 @@ export const contentType = "image/png";
 
 export default async function Icon() {
   // Read local profile photo to ensure fast, reliable generation without external requests
-  const imagePath = path.join(process.cwd(), "public", "DSC_9812.jpg");
+  const imagePath = path.join(process.cwd(), "public", "avatar_optimized.jpg");
   const imageBuffer = fs.readFileSync(imagePath);
   const base64Image = `data:image/jpeg;base64,${imageBuffer.toString("base64")}`;
 

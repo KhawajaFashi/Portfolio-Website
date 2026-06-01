@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter, JetBrains_Mono, Geist, Geist_Mono } from "next/font/google";
+import { Inter, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import Nav from "./_components/Nav";
 import CustomCursor from "./_components/CustomCursor";
@@ -8,18 +8,6 @@ import { SpeedInsights } from "@vercel/speed-insights/next";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 const jetbrainsMono = JetBrains_Mono({ subsets: ["latin"], variable: "--font-jetbrains-mono" });
-
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-  display: "swap",
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-  display: "swap",
-});
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://khfa.dev"),
@@ -85,7 +73,7 @@ const jsonLd = {
   name: "Khawaja Fashi Ud Din Abdullah",
   alternateName: "Khawaja Fashi",
   url: "https://khfa.dev",
-  image: "https://khfa.dev/DSC_9812.jpg",
+  image: "https://khfa.dev/avatar_optimized.jpg",
   jobTitle: "Backend Engineer & Cybersecurity Specialist",
   alumniOf: {
     "@type": "EducationalOrganization",
@@ -127,7 +115,7 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
       </head>
-      <body className={`${inter.variable} ${jetbrainsMono.variable} ${geistSans.variable} ${geistMono.variable}`}>
+      <body className={`${inter.variable} ${jetbrainsMono.variable}`}>
         <CustomCursor />
         <Nav />
         <main>{children}</main>
