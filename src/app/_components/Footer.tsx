@@ -1,12 +1,14 @@
 "use client";
 
 import { useState } from "react";
-import { Copy, Check, Mail, Terminal, ArrowUpRight } from "lucide-react";
+import { Copy, Check, Mail, Terminal, ArrowUpRight, Loader2, XCircle } from "lucide-react";
 
 export default function Footer() {
   const [copied, setCopied] = useState(false);
   const [formState, setFormState] = useState({ name: "", email: "", message: "" });
+  const [loading, setLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const copyEmail = () => {
     navigator.clipboard.writeText("fashi449623@gmail.com");
@@ -14,14 +16,43 @@ export default function Footer() {
     setTimeout(() => setCopied(false), 2000);
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!formState.name || !formState.email || !formState.message) return;
-    setSubmitted(true);
-    setTimeout(() => {
-      setSubmitted(false);
+    
+    setLoading(true);
+    setError(null);
+    setSubmitted(false);
+
+    try {
+      const response = await fetch("/api/contact", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formState),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || "Failed to transmit message");
+      }
+
+      setSubmitted(true);
       setFormState({ name: "", email: "", message: "" });
-    }, 2500);
+      setTimeout(() => {
+        setSubmitted(false);
+      }, 5000);
+    } catch (err: any) {
+      console.error("Form transmission error:", err);
+      setError(err.message || "TRANSMISSION_FAILURE");
+      setTimeout(() => {
+        setError(null);
+      }, 5000);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -254,15 +285,31 @@ export default function Footer() {
             {/* Submit button */}
             <button
               type="submit"
-              disabled={submitted}
-              className="group relative transition-all duration-300 font-mono font-bold bg-indigo-600 hover:bg-indigo-500 text-slate-100 text-xs uppercase tracking-widest w-full h-12 overflow-hidden rounded-lg border border-indigo-500/25 disabled:opacity-40 disabled:pointer-events-none cursor-pointer"
+              disabled={loading || submitted}
+              className={`group relative transition-all duration-300 font-mono font-bold text-slate-100 text-xs uppercase tracking-widest w-full h-12 overflow-hidden rounded-lg border cursor-pointer ${
+                error 
+                  ? "bg-red-950/80 border-red-500/30 hover:bg-red-900/80 text-red-200" 
+                  : submitted 
+                  ? "bg-[#0F172A] border-[#22D3A5]/30 text-[#22D3A5]" 
+                  : "bg-indigo-600 hover:bg-indigo-500 border-indigo-500/25 disabled:opacity-40 disabled:pointer-events-none"
+              }`}
             >
               <span className="-translate-x-full bg-gradient-to-r from-transparent via-white/20 to-transparent transition-transform duration-700 absolute inset-0 group-hover:translate-x-full" />
               <span className="relative flex justify-center items-center gap-2">
-                {submitted ? (
+                {loading ? (
+                  <>
+                    <Loader2 className="size-4 animate-spin text-indigo-400" />
+                    TRANSMITTING()
+                  </>
+                ) : submitted ? (
                   <>
                     <Check className="size-4 text-[#22D3A5] animate-bounce" />
                     TRANSMISSION_SUCCESS()
+                  </>
+                ) : error ? (
+                  <>
+                    <XCircle className="size-4 text-red-500 animate-pulse" />
+                    TRANSMISSION_FAILED()
                   </>
                 ) : (
                   <>

@@ -91,7 +91,7 @@ export default function Hero() {
 
           {/* Bio text */}
           <p className="max-w-xl leading-relaxed text-slate-400 text-sm sm:text-base mt-6">
-            I build resilient backend systems where performance and security aren't afterthoughts — they're the foundation. Node.js and Python backend developer with a cybersecurity foundation. Shipped JWT/RBAC authentication cutting API latency by 73%, and protecting 113 API routes at Quem Systems.
+            I build resilient backend systems where performance and security aren't afterthoughts — they're the foundation. Backend Engineer with 2+ years of hands-on experience in Node.js, Python, and PostgreSQL, operating with full autonomy across remote and asynchronous environments. Shipped secure JWT/RBAC frameworks, built live ML threat pipelines, and cut API latency by 73% with zero micro-management.
           </p>
 
           {/* CTA Actions */}
