@@ -160,7 +160,7 @@ export default function Experience() {
                       Backend Developer Intern
                     </div>
                     <div className="font-mono text-indigo-400 text-xs mt-1">
-                      Jun 2025 — Present
+                      Mar 2026 — Present
                     </div>
                   </div>
                 </div>
