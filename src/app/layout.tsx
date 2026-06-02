@@ -5,6 +5,7 @@ import Nav from "./_components/Nav";
 import CustomCursor from "./_components/CustomCursor";
 import { Analytics } from "@vercel/analytics/react";
 import { SpeedInsights } from "@vercel/speed-insights/next";
+import Script from "next/script";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 const jetbrainsMono = JetBrains_Mono({ subsets: ["latin"], variable: "--font-jetbrains-mono" });
@@ -16,7 +17,7 @@ export const metadata: Metadata = {
     template: "%s | Khawaja Fashi",
   },
   description:
-    "Personal portfolio of Khawaja Fashi Ud Din Abdullah, Backend Developer & Cybersecurity Engineer. Specializing in Node.js, Python, PostgreSQL, and secure API architecture.",
+    "Portfolio of Khawaja Fashi, Backend Developer & Cybersecurity Specialist. Expert in Node.js, Python, PostgreSQL, and secure API architecture.",
   authors: [{ name: "Khawaja Fashi Ud Din Abdullah", url: "https://khfa.dev" }],
   creator: "Khawaja Fashi Ud Din Abdullah",
   keywords: [
@@ -32,6 +33,15 @@ export const metadata: Metadata = {
     "khfa.dev",
     "Security Engineer",
   ],
+  icons: {
+    icon: [
+      { url: '/favicon.ico', sizes: 'any' },
+      { url: '/icon.png', type: 'image/png', sizes: '96x96' }
+    ],
+    apple: [
+      { url: '/apple-icon.png', sizes: '180x180', type: 'image/png' }
+    ]
+  },
   alternates: {
     canonical: "https://khfa.dev",
   },
@@ -49,7 +59,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Khawaja Fashi Ud Din Abdullah | Backend & Security",
     description:
-      "Backend Developer · Node.js · Security Engineering · FAST NUCES Islamabad. Specializing in performance architecture, authorization validation protocols, and reliable real-time analytics pipelines.",
+      "Portfolio of Khawaja Fashi, Backend Developer & Cybersecurity Specialist. Expert in Node.js, Python, PostgreSQL, and secure API architecture.",
     url: "https://khfa.dev",
     siteName: "Khawaja Fashi Portfolio",
     locale: "en_US",
@@ -59,10 +69,11 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Khawaja Fashi Ud Din Abdullah | Backend & Security",
     description:
-      "Backend Developer · Node.js · Security Engineering · FAST NUCES Islamabad",
+      "Portfolio of Khawaja Fashi, Backend Developer & Cybersecurity Specialist. Expert in Node.js, Python, PostgreSQL, and secure API architecture.",
     creator: "@KhawajaFashi",
   },
   verification: {
+    // TODO: Replace with real token
     google: "placeholder-google-site-verification",
   },
 };
@@ -114,8 +125,23 @@ export default function RootLayout({
         <link rel="dns-prefetch" href="https://cdn.jsdelivr.net" />
       </head>
       <body className={`${inter.variable} ${jetbrainsMono.variable}`}>
-        <script
+        <Script
+          src="https://www.googletagmanager.com/gtag/js?id=G-6HXPF5C6P5"
+          strategy="afterInteractive"
+        />
+        <Script id="google-analytics" strategy="afterInteractive">
+          {`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+
+            gtag('config', 'G-6HXPF5C6P5');
+          `}
+        </Script>
+        <Script
+          id="json-ld"
           type="application/ld+json"
+          strategy="afterInteractive"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
         <CustomCursor />
