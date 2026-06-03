@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowUpRight } from "lucide-react";
+import { ArrowUpRight, Copy } from "lucide-react";
 
 const LOGOS = [
   { name: "Node.js", src: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/nodejs/nodejs-original.svg" },
@@ -80,28 +80,53 @@ export default function Hero() {
       {/* Left Side Contact Links */}
       <div className="hidden lg:flex absolute left-6 sm:left-12 top-1/2 -translate-y-1/2 flex-col gap-5 items-start z-20 select-none">
         <span className="font-mono text-[8px] uppercase tracking-widest text-slate-400 font-bold">// Link Gateway</span>
-        <a
-          href="mailto:fashi449623@gmail.com"
-          className="font-mono text-[10px] tracking-widest uppercase font-bold text-slate-600 hover:text-[#e04e00] transition-colors flex items-center gap-1.5"
-        >
-          Email <ArrowUpRight className="size-3 text-[#e04e00]" />
-        </a>
-        <a
-          href="https://linkedin.com/in/KhawajaFashi"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="font-mono text-[10px] tracking-widest uppercase font-bold text-slate-600 hover:text-[#e04e00] transition-colors flex items-center gap-1.5"
-        >
-          LinkedIn <ArrowUpRight className="size-3 text-[#e04e00]" />
-        </a>
-        <a
-          href="https://x.com/KhawajaFashi"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="font-mono text-[10px] tracking-widest uppercase font-bold text-slate-600 hover:text-[#e04e00] transition-colors flex items-center gap-1.5"
-        >
-          X.com <ArrowUpRight className="size-3 text-[#e04e00]" />
-        </a>
+        
+        {/* Email Link */}
+        <div className="relative group flex items-center">
+          <a
+            href="mailto:fashi449623@gmail.com"
+            title="Click to copy to clipboard"
+            onClick={() => {
+              navigator.clipboard.writeText("fashi449623@gmail.com");
+            }}
+            className="font-mono text-[10px] tracking-widest uppercase font-bold text-slate-600 hover:text-[#e04e00] transition-colors flex items-center gap-1.5 cursor-pointer"
+          >
+            Email <Copy  className="size-3 text-[#e04e00]" />
+          </a>
+          <span className="absolute left-full ml-4 opacity-0 scale-95 translate-x-[-8px] group-hover:opacity-100 group-hover:scale-100 group-hover:translate-x-0 transition-all duration-300 pointer-events-none whitespace-nowrap bg-black border border-white/10 text-white text-[9px] font-mono tracking-widest py-1.5 px-3 shadow-lg z-30">
+            fashi449623@gmail.com
+          </span>
+        </div>
+
+        {/* LinkedIn Link */}
+        <div className="relative group flex items-center">
+          <a
+            href="https://www.linkedin.com/in/khawaja-fashi-ud-din-abdullah-859b7a23b/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="font-mono text-[10px] tracking-widest uppercase font-bold text-slate-600 hover:text-[#e04e00] transition-colors flex items-center gap-1.5 cursor-pointer"
+          >
+            LinkedIn <ArrowUpRight className="size-3 text-[#e04e00]" />
+          </a>
+          <span className="absolute left-full ml-4 opacity-0 scale-95 translate-x-[-8px] group-hover:opacity-100 group-hover:scale-100 group-hover:translate-x-0 transition-all duration-300 pointer-events-none whitespace-nowrap bg-black border border-white/10 text-white text-[9px] font-mono tracking-widest py-1.5 px-3 shadow-lg z-30">
+            in/khawaja-fashi-ud-din-abdullah
+          </span>
+        </div>
+
+        {/* X.com Link */}
+        <div className="relative group flex items-center">
+          <a
+            href="https://x.com/KhawajaFashi"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="font-mono text-[10px] tracking-widest uppercase font-bold text-slate-600 hover:text-[#e04e00] transition-colors flex items-center gap-1.5 cursor-pointer"
+          >
+            X.com <ArrowUpRight className="size-3 text-[#e04e00]" />
+          </a>
+          <span className="absolute left-full ml-4 opacity-0 scale-95 translate-x-[-8px] group-hover:opacity-100 group-hover:scale-100 group-hover:translate-x-0 transition-all duration-300 pointer-events-none whitespace-nowrap bg-black border border-white/10 text-white text-[9px] font-mono tracking-widest py-1.5 px-3 shadow-lg z-30">
+            @KhawajaFashi
+          </span>
+        </div>
       </div>
 
       {/* Marquee Ticker strip at the bottom */}

@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowUpRight } from "lucide-react";
+import { ArrowUpRight, Copy } from "lucide-react";
 
 export default function Footer() {
   const handleNav = (href: string) => {
@@ -32,9 +32,13 @@ export default function Footer() {
           <div className="flex flex-col gap-3">
             <a 
               href="mailto:fashi449623@gmail.com" 
+              title="Click to copy to clipboard"
+              onClick={() => {
+                navigator.clipboard.writeText("fashi449623@gmail.com");
+              }}
               className="text-slate-400 hover:text-white transition-colors uppercase flex items-center gap-1.5"
             >
-              fashi449623@gmail.com <ArrowUpRight className="size-3 text-[#e04e00]" />
+              fashi449623@gmail.com <Copy className="size-3 text-[#e04e00]" />
             </a>
             <span className="text-slate-600">© 2026</span>
           </div>
@@ -51,7 +55,7 @@ export default function Footer() {
                 GitHub <ArrowUpRight className="size-3 text-[#e04e00]" />
               </a>
               <a 
-                href="https://linkedin.com/in/KhawajaFashi" 
+                href="https://www.linkedin.com/in/khawaja-fashi-ud-din-abdullah-859b7a23b/" 
                 target="_blank" 
                 rel="noopener noreferrer" 
                 className="text-slate-400 hover:text-white transition-colors uppercase flex items-center gap-1.5"

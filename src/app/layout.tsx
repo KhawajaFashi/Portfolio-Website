@@ -100,7 +100,7 @@ const jsonLd = {
   },
   sameAs: [
     "https://github.com/KhawajaFashi",
-    "https://linkedin.com/in/KhawajaFashi",
+    "https://www.linkedin.com/in/khawaja-fashi-ud-din-abdullah-859b7a23b/",
     "https://x.com/KhawajaFashi",
   ],
   knowsAbout: [

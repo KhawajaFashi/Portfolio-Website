@@ -6,11 +6,11 @@ import { motion, useMotionValue, useSpring } from "framer-motion";
 interface Point {
   x: number;
   y: number;
-  age: number;
+  age: number; // 1.0 = fresh, 0.0 = expired
 }
 
 export default function CustomCursor() {
-  const [hidden, setHidden] = useState(true);
+  const [visible, setVisible] = useState(false);
   const [hovered, setHovered] = useState(false);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const pointsRef = useRef<Point[]>([]);
@@ -18,62 +18,56 @@ export default function CustomCursor() {
   const cursorX = useMotionValue(-100);
   const cursorY = useMotionValue(-100);
 
-  const springConfig = { damping: 30, stiffness: 280, mass: 0.7 };
+  const springConfig = { damping: 30, stiffness: 300, mass: 0.7 };
   const cursorXSpring = useSpring(cursorX, springConfig);
   const cursorYSpring = useSpring(cursorY, springConfig);
 
   useEffect(() => {
-    // Hide cursor on touch devices
-    if (window.matchMedia("(pointer: coarse)").matches) {
-      return;
-    }
+    // No custom cursor on touch devices
+    if (window.matchMedia("(pointer: coarse)").matches) return;
 
-    const canvas = canvasRef.current;
-    if (canvas) {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
-    }
-
-    const handleResize = () => {
-      if (canvasRef.current) {
-        canvasRef.current.width = window.innerWidth;
-        canvasRef.current.height = window.innerHeight;
-      }
+    /* ── Canvas sizing ─────────────────────────────────────────── */
+    const updateCanvasSize = () => {
+      const c = canvasRef.current;
+      if (!c) return;
+      const dpr = window.devicePixelRatio || 1;
+      // Physical pixel buffer
+      c.width = window.innerWidth * dpr;
+      c.height = window.innerHeight * dpr;
+      // CSS size locked to logical pixels so clientX/Y coords line up
+      c.style.width = `${window.innerWidth}px`;
+      c.style.height = `${window.innerHeight}px`;
     };
-    window.addEventListener("resize", handleResize);
+    updateCanvasSize();
+    window.addEventListener("resize", updateCanvasSize);
 
+    /* ── Mouse tracking ────────────────────────────────────────── */
     const moveCursor = (e: MouseEvent) => {
       cursorX.set(e.clientX);
       cursorY.set(e.clientY);
-      setHidden(false);
+      setVisible(true);
 
-      pointsRef.current.push({ x: e.clientX, y: e.clientY, age: 1.0 });
-      if (pointsRef.current.length > 50) {
-        pointsRef.current.shift();
-      }
+      // Push EVERY position — dense sampling is required for a smooth ribbon.
+      // (sparse points → segments too long → visible joints/dots)
+      const pts = pointsRef.current;
+      pts.push({ x: e.clientX, y: e.clientY, age: 1.0 });
+      if (pts.length > 55) pts.shift(); // hard cap: keeps trail short
     };
 
-    const handleMouseLeave = () => {
-      setHidden(true);
-    };
-
-    const handleMouseEnter = () => {
-      setHidden(false);
-    };
+    const handleMouseLeave = () => setVisible(false);
+    const handleMouseEnter = () => setVisible(true);
 
     const handleMouseOver = (e: MouseEvent) => {
-      const target = e.target as HTMLElement | null;
-      if (!target) return;
-      
-      const isClickable =
-        target.tagName === "BUTTON" ||
-        target.tagName === "A" ||
-        target.closest("button") ||
-        target.closest("a") ||
-        target.classList.contains("cursor-pointer") ||
-        window.getComputedStyle(target).cursor === "pointer";
-
-      setHovered(!!isClickable);
+      const t = e.target as HTMLElement | null;
+      if (!t) return;
+      const clickable =
+        t.tagName === "BUTTON" ||
+        t.tagName === "A" ||
+        !!t.closest("button") ||
+        !!t.closest("a") ||
+        t.classList.contains("cursor-pointer") ||
+        window.getComputedStyle(t).cursor === "pointer";
+      setHovered(clickable);
     };
 
     window.addEventListener("mousemove", moveCursor);
@@ -81,78 +75,104 @@ export default function CustomCursor() {
     document.addEventListener("mouseenter", handleMouseEnter);
     window.addEventListener("mouseover", handleMouseOver);
 
-    // Canvas animation loop
-    let animFrameId: number;
-    const tick = () => {
-      const currentCanvas = canvasRef.current;
-      if (currentCanvas) {
-        const ctx = currentCanvas.getContext("2d");
-        if (ctx) {
-          ctx.clearRect(0, 0, currentCanvas.width, currentCanvas.height);
-          const points = pointsRef.current;
+    /* ── Draw helpers ──────────────────────────────────────────── */
+    /**
+     * Build a single continuous quadratic B-spline through the midpoints
+     * of consecutive points. Passing through midpoints ensures C1 continuity
+     * (tangent-smooth joints) — zero visible seams.
+     */
+    function buildSplinePath(
+      ctx: CanvasRenderingContext2D,
+      pts: Point[]
+    ) {
+      ctx.beginPath();
+      ctx.moveTo(pts[0].x, pts[0].y);
+      for (let i = 1; i < pts.length - 1; i++) {
+        const mx = (pts[i].x + pts[i + 1].x) / 2;
+        const my = (pts[i].y + pts[i + 1].y) / 2;
+        ctx.quadraticCurveTo(pts[i].x, pts[i].y, mx, my);
+      }
+      // Reach exactly the latest cursor position
+      const last = pts[pts.length - 1];
+      ctx.lineTo(last.x, last.y);
+    }
 
-          if (points.length === 2) {
-            ctx.beginPath();
-            ctx.moveTo(points[0].x, points[0].y);
-            ctx.lineTo(points[1].x, points[1].y);
-            ctx.strokeStyle = `rgba(224, 78, 0, ${0.5 * points[1].age})`;
-            ctx.lineWidth = 2.0;
-            ctx.stroke();
-          } else if (points.length > 2) {
-            ctx.lineCap = "round";
+    /* ── Animation loop ────────────────────────────────────────── */
+    let animFrameId: number;
+
+    const tick = () => {
+      const canvas = canvasRef.current;
+      if (canvas) {
+        const ctx = canvas.getContext("2d");
+        if (ctx) {
+          const dpr = window.devicePixelRatio || 1;
+
+          // Clear full physical buffer each frame
+          ctx.setTransform(1, 0, 0, 1, 0, 0);
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+          ctx.scale(dpr, dpr); // draw in logical CSS-pixel space
+
+          const pts = pointsRef.current;
+
+          if (pts.length >= 2) {
+            const tail = pts[0];
+            const head = pts[pts.length - 1];
+
+            // Safe gradient direction (avoid zero-length when cursor barely moves)
+            const dx = head.x - tail.x;
+            const dy = head.y - tail.y;
+            const len = Math.hypot(dx, dy);
+
+            // Gradient: fully transparent at the oldest point → solid at cursor
+            const makeGradient = (alpha: number) => {
+              if (len < 1) {
+                return `rgba(224, 78, 0, ${alpha})`;
+              }
+              const g = ctx.createLinearGradient(
+                tail.x, tail.y,
+                head.x, head.y
+              );
+              g.addColorStop(0,   "rgba(224, 78, 0, 0)");
+              g.addColorStop(0.5, `rgba(224, 78, 0, ${alpha * 0.35})`);
+              g.addColorStop(1,   `rgba(224, 78, 0, ${alpha})`);
+              return g;
+            };
+
+            ctx.lineCap  = "round";
             ctx.lineJoin = "round";
 
-            // Draw line using B-Spline quadratic curves connecting midpoints
-            for (let i = 1; i < points.length; i++) {
-              const ratio = i / points.length;
-              ctx.beginPath();
+            /* Pass 1 – soft glow halo
+               Wide, low-opacity stroke with blur → hides any micro-artifacts
+               and gives the ribbon an organic glow. */
+            ctx.save();
+            ctx.shadowColor = "rgba(224, 78, 0, 0.45)";
+            ctx.shadowBlur  = 8;
+            buildSplinePath(ctx, pts);
+            ctx.strokeStyle = makeGradient(0.55);
+            ctx.lineWidth   = 6;
+            ctx.stroke();
+            ctx.restore();
 
-              if (i === 1) {
-                // First segment: straight line to first midpoint
-                ctx.moveTo(points[0].x, points[0].y);
-                ctx.lineTo((points[0].x + points[1].x) / 2, (points[0].y + points[1].y) / 2);
-              } else if (i === points.length - 1) {
-                // Last segment: curve to last point controlled by N-2
-                const pPrevPrev = points[i - 2];
-                const pPrev = points[i - 1];
-                const pCurr = points[i];
-                ctx.moveTo((pPrevPrev.x + pPrev.x) / 2, (pPrevPrev.y + pPrev.y) / 2);
-                ctx.quadraticCurveTo(pPrev.x, pPrev.y, pCurr.x, pCurr.y);
-              } else {
-                // Middle segments: curve from mid(i-2, i-1) to mid(i-1, i) controlled by i-1
-                const pPrevPrev = points[i - 2];
-                const pPrev = points[i - 1];
-                const pCurr = points[i];
-
-                const startX = (pPrevPrev.x + pPrev.x) / 2;
-                const startY = (pPrevPrev.y + pPrev.y) / 2;
-                const endX = (pPrev.x + pCurr.x) / 2;
-                const endY = (pPrev.y + pCurr.y) / 2;
-
-                ctx.moveTo(startX, startY);
-                ctx.quadraticCurveTo(pPrev.x, pPrev.y, endX, endY);
-              }
-
-              // Calligraphic tapering (thicker at cursor, thinner at tail) and decay opacity
-              ctx.strokeStyle = `rgba(224, 78, 0, ${ratio * 0.95 * points[i].age})`;
-              ctx.lineWidth = ratio * 5.0 + 0.5;
-              ctx.stroke();
-            }
+            /* Pass 2 – sharp bright core
+               Thin, high-opacity stroke on top → crisp luminous center line. */
+            buildSplinePath(ctx, pts);
+            ctx.strokeStyle = makeGradient(0.92);
+            ctx.lineWidth   = 1.8;
+            ctx.stroke();
           }
 
-          // Age and filter points (slower decay rate 0.025 for a more graceful trail)
-          points.forEach((p) => {
-            p.age -= 0.025;
-          });
-          pointsRef.current = points.filter((p) => p.age > 0);
+          // Age every point; remove expired ones
+          pts.forEach((p) => (p.age -= 0.038));
+          pointsRef.current = pts.filter((p) => p.age > 0);
         }
       }
       animFrameId = requestAnimationFrame(tick);
     };
     animFrameId = requestAnimationFrame(tick);
 
+    /* ── Cleanup ───────────────────────────────────────────────── */
     return () => {
-      window.removeEventListener("resize", handleResize);
+      window.removeEventListener("resize", updateCanvasSize);
       window.removeEventListener("mousemove", moveCursor);
       document.removeEventListener("mouseleave", handleMouseLeave);
       document.removeEventListener("mouseenter", handleMouseEnter);
@@ -161,43 +181,44 @@ export default function CustomCursor() {
     };
   }, [cursorX, cursorY]);
 
-  if (hidden) return null;
-
   return (
     <>
-      {/* Trailing canvas line cursor effect */}
+      {/* Canvas — always in DOM, sized on mount */}
       <canvas
         ref={canvasRef}
-        className="pointer-events-none fixed inset-0 z-[9999]"
+        className="pointer-events-none fixed z-[9999]"
+        style={{ top: 0, left: 0 }}
       />
 
-      {/* Outer animated trailing ring */}
+      {/* Outer ring — springs toward cursor */}
       <motion.div
         className="pointer-events-none fixed left-0 top-0 z-[9999] rounded-full border -translate-x-1/2 -translate-y-1/2"
         style={{
           x: cursorXSpring,
           y: cursorYSpring,
-          width: hovered ? 46 : 26,
+          width:  hovered ? 46 : 26,
           height: hovered ? 46 : 26,
-          borderColor: hovered ? "rgba(224, 78, 0, 0.85)" : "rgba(224, 78, 0, 0.45)",
-          backgroundColor: hovered ? "rgba(224, 78, 0, 0.1)" : "rgba(224, 78, 0, 0.02)",
-          boxShadow: hovered 
+          borderColor:     hovered ? "rgba(224, 78, 0, 0.85)" : "rgba(224, 78, 0, 0.45)",
+          backgroundColor: hovered ? "rgba(224, 78, 0, 0.1)"  : "rgba(224, 78, 0, 0.02)",
+          boxShadow: hovered
             ? "0 0 16px rgba(224, 78, 0, 0.25), inset 0 0 8px rgba(224, 78, 0, 0.15)"
-            : "none"
+            : "none",
+          opacity: visible ? 1 : 0,
         }}
         transition={{ type: "tween", ease: "backOut", duration: 0.15 }}
       />
 
-      {/* Inner precise dot */}
+      {/* Precise inner dot — tracks cursor exactly */}
       <motion.div
         className="pointer-events-none fixed left-0 top-0 z-[9999] rounded-full -translate-x-1/2 -translate-y-1/2"
         style={{
           x: cursorX,
           y: cursorY,
-          width: hovered ? 6 : 8,
-          height: hovered ? 6 : 8,
-          backgroundColor: hovered ? "#e04e00" : "#e04e00",
-          boxShadow: hovered ? "0 0 10px #e04e00" : "0 0 6px #e04e00",
+          width:           hovered ? 4 : 8,
+          height:          hovered ? 6 : 8,
+          backgroundColor: "#e04e00",
+          boxShadow:       hovered ? "0 0 10px #e04e00" : "0 0 6px #e04e00",
+          opacity: visible ? 1 : 0,
         }}
       />
     </>
