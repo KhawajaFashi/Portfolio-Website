@@ -48,14 +48,14 @@ export default function Hero() {
         {/* Dynamic Minimal Sub-Badge */}
         <div className="my-8 py-2.5 border-y border-black/10 w-full max-w-[340px] flex items-center justify-center">
           <span className="font-mono text-slate-500 text-[10px] tracking-[4px] uppercase font-bold">
-            Independent Backend Architect
+            Backend Architect/Engineer
           </span>
         </div>
 
         {/* Precise Bio Statement */}
         <p className="max-w-xl leading-relaxed text-slate-600 text-sm sm:text-base font-geist font-medium">
-          Architected Redis-based caching layers independently, reducing database read load by 45%.
-          Focused on high-performance Node.js, Python, and PostgreSQL systems with zero micro-management.
+          I build the part of the app nobody sees — until it breaks. Node.js, Python, and PostgreSQL,
+          shipped async, secured properly, and never requiring a follow-up Slack message.
         </p>
 
         {/* Pill Actions */}
