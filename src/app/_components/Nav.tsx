@@ -1,47 +1,51 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { User, Briefcase, Code, Mail } from "lucide-react";
+import { User } from "lucide-react";
 
 const NAV_ITEMS = [
-  { label: "About", href: "#about", icon: User },
-  { label: "Experience", href: "#experience", icon: Briefcase },
-  { label: "Projects", href: "#projects", icon: Code },
-  { label: "Contact", href: "#contact", icon: Mail },
+  { label: "Home", href: "#hero" },
+  { label: "About", href: "#about" },
+  { label: "Experience", href: "#experience" },
+  { label: "Projects", href: "#projects" },
 ];
 
 export default function Nav() {
-  const [active, setActive] = useState("about");
+  const [active, setActive] = useState("hero");
   const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
       setScrolled(window.scrollY > 20);
-    };
-    window.addEventListener("scroll", handleScroll);
 
-    const observer = new IntersectionObserver(
-      (entries) => {
-        for (const entry of entries) {
-          if (entry.isIntersecting) {
-            setActive(entry.target.id);
+      const sections = ["hero", "about", "experience", "experience-light", "projects", "contact"];
+      let currentActive = "hero";
+      const viewportCenter = window.innerHeight / 2;
+
+      for (let i = sections.length - 1; i >= 0; i--) {
+        const sectionId = sections[i];
+        const el = document.getElementById(sectionId);
+        if (el) {
+          const rect = el.getBoundingClientRect();
+          if (rect.top <= viewportCenter && rect.bottom >= viewportCenter) {
+            currentActive = sectionId;
+            break;
           }
         }
-      },
-      { rootMargin: "-45% 0px -45% 0px" }
-    );
+      }
+      setActive(currentActive);
+    };
 
-    const heroEl = document.querySelector("#hero");
-    if (heroEl) observer.observe(heroEl);
+    window.addEventListener("scroll", handleScroll);
+    // Initial check
+    handleScroll();
 
-    NAV_ITEMS.forEach(({ href }) => {
-      const el = document.querySelector(href);
-      if (el) observer.observe(el);
-    });
+    // Check again after a short delay to ensure elements are mounted
+    const timer = setTimeout(handleScroll, 100);
 
     return () => {
       window.removeEventListener("scroll", handleScroll);
-      observer.disconnect();
+      clearTimeout(timer);
     };
   }, []);
 
@@ -52,45 +56,89 @@ export default function Nav() {
     }
   };
 
+  const isDarkSection =
+    active === "projects" ||
+    active === "contact" ||
+    active === "experience";
+
   return (
     <header
       className={`fixed top-0 inset-x-0 z-50 transition-all duration-300 ${
         scrolled
-          ? "bg-[#080B12]/80 backdrop-blur-md border-b border-indigo-500/10 py-4"
-          : "bg-transparent py-6"
+          ? isDarkSection
+            ? "bg-black/85 backdrop-blur-md border-b border-white/10 py-3"
+            : "bg-[#f9f9f9]/85 backdrop-blur-md border-b border-black/5 py-3"
+          : "bg-transparent py-5"
       }`}
     >
-      <div className="max-w-[1140px] mx-auto px-6 sm:px-12 flex justify-between items-center">
+      <div className="max-w-[1240px] mx-auto px-6 sm:px-12 flex justify-between items-center">
         {/* Logo */}
         <button
           onClick={() => handleNav("#hero")}
-          className="font-mono text-slate-100 text-sm leading-5 flex items-center gap-1 group cursor-pointer"
+          className={`font-mono text-sm leading-5 flex items-center gap-1 group cursor-pointer transition-colors duration-300 ${
+            isDarkSection ? "text-white" : "text-black"
+          }`}
         >
-          <span className="text-[#22D3A5]">{`>_`}</span>
-          <span className="font-semibold">kfa</span>
-          <span className="text-indigo-400">.dev</span>
-          <span className="animate-pulse text-[#22D3A5] group-hover:text-indigo-400">_</span>
+          <span className="text-[#e04e00] font-bold">{`>_`}</span>
+          <span className="font-extrabold tracking-tight">kfa</span>
+          <span className="text-slate-400 font-medium">.dev</span>
+          <span className={`animate-pulse text-[#e04e00] ${isDarkSection ? "group-hover:text-white" : "group-hover:text-black"}`}>_</span>
         </button>
 
-        {/* Links */}
-        <div className="flex items-center gap-1 sm:gap-2">
-          {NAV_ITEMS.map(({ label, href, icon: Icon }) => {
-            const isActive = active === href.slice(1);
+        {/* Capsule Navigation Links */}
+        <nav className={`hidden md:flex items-center border rounded-full p-1 shadow-sm transition-colors duration-300 ${
+          isDarkSection 
+            ? "bg-[#111111] border-white/10" 
+            : "bg-[#eeeeee] border-black/5"
+        }`}>
+          {NAV_ITEMS.map(({ label, href }) => {
+            const isActive =
+              active === href.slice(1) ||
+              (href === "#experience" && active === "experience-light");
             return (
               <button
                 key={href}
                 onClick={() => handleNav(href)}
-                className={`font-mono transition-all duration-200 rounded-lg text-xs sm:text-sm px-3 sm:px-4 py-2 flex items-center gap-1.5 sm:gap-2 cursor-pointer ${
+                className={`font-geist font-medium text-xs rounded-full px-5 py-2.5 transition-all duration-200 cursor-pointer ${
                   isActive
-                    ? "bg-indigo-500/10 text-slate-100 font-medium border border-indigo-500/20"
-                    : "text-slate-500 hover:text-slate-300 hover:bg-slate-500/5 border border-transparent"
+                    ? isDarkSection
+                      ? "bg-white text-black shadow-sm"
+                      : "bg-black text-white shadow-sm"
+                    : isDarkSection
+                    ? "text-slate-400 hover:text-white hover:bg-white/5"
+                    : "text-slate-600 hover:text-black hover:bg-black/5"
                 }`}
               >
-                <Icon className={`size-3.5 sm:size-4 ${isActive ? "text-[#22D3A5]" : "text-slate-500"}`} />
-                <span className="hidden xs:inline">{label}</span>
+                {label}
               </button>
             );
           })}
+        </nav>
+
+        {/* Right CTA Actions */}
+        <div className="flex items-center gap-3">
+          {/* <button
+            onClick={() => handleNav("#contact")}
+            className={`font-geist font-semibold text-xs border transition-all duration-200 rounded-full px-5 py-2.5 cursor-pointer shadow-sm ${
+              isDarkSection
+                ? "border-white/15 bg-[#111111] text-white hover:bg-white hover:text-black"
+                : "border-black/15 bg-white hover:bg-black hover:text-white"
+            }`}
+          >
+            Discover more
+          </button> */}
+          
+          <button 
+            onClick={() => handleNav("#about")}
+            className={`size-9 rounded-full border flex items-center justify-center transition-all cursor-pointer shadow-sm ${
+              isDarkSection
+                ? "bg-[#111111] border-white/10 text-white hover:bg-white hover:text-black"
+                : "bg-[#eeeeee] border-black/5 text-black hover:bg-black hover:text-white"
+            }`}
+            aria-label="View about section profile"
+          >
+            <User className="size-4" />
+          </button>
         </div>
       </div>
     </header>

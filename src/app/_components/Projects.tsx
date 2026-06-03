@@ -1,234 +1,239 @@
 "use client";
 
-import { ArrowRight, ArrowUpRight, Plus, Terminal, Activity } from "lucide-react";
-import IoTWidget from "./IoTWidget";
-import HypeWaitWidget from "./HypeWaitWidget";
-import LiveTeamGamesWidget from "./LiveTeamGamesWidget";
+import { useState, useEffect, useRef } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { ArrowUpRight } from "lucide-react";
+
+interface MetricItem {
+  value: string;
+  label: string;
+}
+
+interface ProjectItem {
+  id: number;
+  title: string;
+  category: string;
+  tech: string[];
+  description: string;
+  metrics: MetricItem[];
+  highlights: string[];
+  github: string;
+}
+
+const PROJECTS: ProjectItem[] = [
+  {
+    id: 0,
+    title: "IoT Rogue Traffic Simulator",
+    category: "Cloud-Native Architectures",
+    tech: ["Python", "MQTT", "Scikit-learn", "Streamlit"],
+    description: "A real-time anomaly detection pipeline that flags rogue traffic patterns using a trained Random Forest classifier.",
+    metrics: [
+      { value: "95%+", label: "Anomaly Accuracy" },
+      { value: "<300ms", label: "Model Latency" },
+      { value: "350K+", label: "Trained Entries" }
+    ],
+    highlights: [
+      "Built an end-to-end MQTT telemetry ingestion pipeline using Python to parse data across 20+ simulated IoT points.",
+      "Trained a Random Forest model on 350K+ entries, optimizing classification overhead to keep processing speed under 300ms.",
+      "Reduced mean detection-to-alert latency from 5 minutes to 15 seconds using live database-driven dashboards."
+    ],
+    github: "https://github.com/KhawajaFashi"
+  },
+  {
+    id: 1,
+    title: "HypeWait Queue Drops",
+    category: "Microservices Migration",
+    tech: ["Node.js", "Redis", "WebSocket", "JWT"],
+    description: "Hash-based Proof-of-Work virtual queue system designed to handle heavy traffic spikes during high-demand product drops.",
+    metrics: [
+      { value: "Client PoW", label: "Admission Rule" },
+      { value: "Stateless", label: "Redis Caching" },
+      { value: "Real-time", label: "WebSocket Sync" }
+    ],
+    highlights: [
+      "Secured queues against bot flooding by shifting computational validation costs to the client via cryptographic PoW nonces.",
+      "Maintained stateless queue counts in Redis memory caches, preventing primary database locks during admission drops.",
+      "Streamed live queue status numbers and entry tokens dynamically to active users over raw WebSocket tunnels."
+    ],
+    github: "https://github.com/KhawajaFashi"
+  },
+  {
+    id: 2,
+    title: "LiveTeamGames Grid",
+    category: "Scalable Systems Design",
+    tech: ["Node.js", "PostgreSQL", "WebSocket", "REST API"],
+    description: "Real-time coordination platform with server-side coordinate tracking and dynamic state matching features.",
+    metrics: [
+      { value: "PostgreSQL", label: "State Store" },
+      { value: "<50ms", label: "State Updates" },
+      { value: "Match Map", label: "Grid Interface" }
+    ],
+    highlights: [
+      "Architected server-side coordinate tracking pipelines, managing team state mutations across dynamic match coordinates.",
+      "Handled high-frequency updates by optimizing PostgreSQL write queries and query parallelization routines.",
+      "Designed a real-time event grid visualizer mapping dynamic coordinates directly on client browsers."
+    ],
+    github: "https://github.com/KhawajaFashi"
+  }
+];
 
 export default function Projects() {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [activeIndex, setActiveIndex] = useState(0);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      if (!containerRef.current) return;
+      const rect = containerRef.current.getBoundingClientRect();
+      const scrolledOffset = -rect.top;
+      const totalScrollable = rect.height - window.innerHeight;
+
+      if (totalScrollable <= 0) return;
+
+      const progress = Math.max(0, Math.min(1, scrolledOffset / totalScrollable));
+
+      let index = 0;
+      if (progress > 0.33 && progress <= 0.66) {
+        index = 1;
+      } else if (progress > 0.66) {
+        index = 2;
+      }
+
+      setActiveIndex(index);
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  const activeProject = PROJECTS[activeIndex];
+
   return (
-    <section id="projects" className="relative bg-[#080B12] text-slate-100 py-24 overflow-hidden px-6 sm:px-12">
-      {/* Background visual helpers */}
-      <div className="absolute inset-0 bg-indigo-500/4 pointer-events-none" />
-      <div className="absolute inset-0 bg-indigo-500/6 pointer-events-none" />
-      
-      {/* Absolute floating decorations */}
-      <div className="leading-tight select-none font-mono text-indigo-500/10 text-[10px] absolute right-16 top-16 hidden md:block text-right">
-        01001001 01101111 01010100
-        <br />
-        0x4D515454 0x53494D
-        <br />
-        11010010 01100000 10110101
-      </div>
-
-      <div className="text-indigo-500/30 absolute left-8 top-12">
-        <Plus className="size-4" />
-      </div>
-      <div className="text-indigo-500/30 absolute right-12 top-12">
-        <Plus className="size-4" />
-      </div>
-      <div className="text-indigo-500/30 absolute left-8 bottom-12">
-        <Plus className="size-4" />
-      </div>
-      <div className="text-indigo-500/30 absolute right-12 bottom-12">
-        <Plus className="size-4" />
-      </div>
-
-      <div className="max-w-[1140px] mx-auto w-full">
+    <div ref={containerRef} id="projects" className="relative bg-black text-white min-h-[300vh] w-full">
+      {/* Sticky viewport wrapper */}
+      <div className="sticky top-0 h-screen w-full flex items-center overflow-hidden">
         
-        {/* Section Header */}
-        <div className="relative z-10 flex flex-col mb-12">
-          <div className="flex items-center gap-4">
-            <span className="font-mono text-slate-500 text-sm leading-5 tracking-widest">
-              // 03
-            </span>
-            <div className="bg-indigo-500/20 w-16 h-px" />
-            <span className="font-mono uppercase text-indigo-400 text-xs tracking-[4.8px]">
-              projects.db
-            </span>
-          </div>
-          <div className="relative mt-2">
-            <h2 className="leading-none select-none font-sans font-extrabold text-slate-100 text-6xl sm:text-8xl lg:text-[100px] tracking-tighter">
-              projects
-            </h2>
-          </div>
-        </div>
+        {/* Large visual overlapping orange circle from Stitch mockup */}
+        <div 
+          className="absolute -right-24 -top-24 w-[380px] h-[380px] sm:w-[600px] sm:h-[600px] rounded-full border-[2.5px] border-[#e04e00]/30 pointer-events-none z-0" 
+          style={{
+            transform: "rotate(15deg)",
+            background: "radial-gradient(circle, transparent 70%, rgba(224, 78, 0, 0.02) 100%)"
+          }}
+        />
 
-        {/* Featured Project: IoT Rogue Traffic Simulator */}
-        <div className="relative z-10 mt-12 mb-16">
-          <div className="relative shadow-[0_40px_80px_-30px_rgba(0,0,0,0.8)] rounded-2xl bg-[#0D1117]/80 backdrop-blur-md border border-indigo-500/20 overflow-hidden">
-            <div className="bg-gradient-to-r from-transparent via-[#6366F1]/50 to-transparent absolute inset-x-0 top-0 h-px" />
+        {/* Dynamic Desktop Grid Layout */}
+        <div className="max-w-[1240px] mx-auto w-full px-6 sm:px-12 grid grid-cols-1 lg:grid-cols-[45%_55%] gap-12 sm:gap-16 relative z-10 items-center">
+          
+          {/* Left Column: Sticky Title list */}
+          <div className="flex flex-col gap-8 select-none">
+            <div className="flex items-baseline gap-3 mb-4">
+              <span className="font-mono text-slate-500 text-xs font-bold">// 03</span>
+              <span className="font-mono text-[#e04e00] text-xs uppercase tracking-widest font-extrabold">Active Projects</span>
+            </div>
+
+            {/* List of titles */}
+            <div className="flex flex-col gap-6">
+              {PROJECTS.map((proj, idx) => {
+                const isActive = idx === activeIndex;
+                return (
+                  <div
+                    key={proj.id}
+                    className={`flex flex-col gap-1 transition-all duration-500 text-left`}
+                    style={{ opacity: isActive ? 1.0 : 0.2 }}
+                  >
+                    <span className="font-mono text-[#e04e00] text-[10px] tracking-wider uppercase font-bold">
+                      {proj.category}
+                    </span>
+                    <h3 className="font-serif font-extrabold text-3xl sm:text-5xl lg:text-[46px] leading-tight tracking-tight uppercase">
+                      {proj.title}
+                    </h3>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Right Column: Dynamic Project Window inside mockup frame */}
+          <div className="relative bg-[#111111] border border-white/10 p-6 sm:p-8 rounded-none shadow-2xl min-h-[520px] flex flex-col justify-between">
+            <div className="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-[#e04e00] to-transparent" />
             
-            {/* Grid structure: 55% Details, 45% Live Interactive Graph */}
-            <div className="grid grid-cols-1 lg:grid-cols-[55%_45%]">
-              
-              {/* Left detail card content */}
-              <div className="p-8 sm:p-12 flex flex-col justify-center">
-                <div className="flex items-center gap-4">
-                  <span className="font-mono font-bold uppercase text-[#22D3A5] text-xs tracking-[4px]">
-                    Featured Project
-                  </span>
-                  <div className="bg-indigo-500/15 flex-1 h-px" />
-                  <span className="font-mono text-slate-500 text-xs">
-                    Nov 2025
-                  </span>
-                </div>
-
-                <h3 className="font-sans font-bold text-slate-100 text-3xl sm:text-5xl leading-[1.1] tracking-tight mt-6">
-                  IoT Rogue Traffic
-                  <br />
-                  Detection Simulator
-                </h3>
-
-                <p className="font-mono text-xs sm:text-sm tracking-wide mt-4 text-[#22D3A5] flex flex-wrap gap-x-2 gap-y-1">
-                  <span>Python</span> <span className="text-slate-700">/</span>
-                  <span>MQTT</span> <span className="text-slate-700">/</span>
-                  <span>Scikit-learn</span> <span className="text-slate-700">/</span>
-                  <span>Streamlit</span>
-                </p>
-
-                <p className="max-w-[560px] leading-relaxed text-slate-400 text-sm sm:text-[15px] mt-6">
-                  A real-time anomaly detection pipeline that ingests simulated IoT telemetry over MQTT and flags rogue traffic patterns using a trained Random Forest classifier. Surcovers threats in seconds, not minutes — with a live simulation and network categorization tool.
-                </p>
-
-                {/* Accuracy/Latency metrics list */}
-                <div className="flex flex-wrap mt-8 gap-x-6 gap-y-4">
-                  <div className="flex flex-col pr-4 border-r border-indigo-500/10">
-                    <span className="leading-none font-sans font-extrabold text-slate-100 text-2xl sm:text-3xl">
-                      95%<span className="text-[#22D3A5]">+</span>
-                    </span>
-                    <span className="font-mono uppercase text-slate-500 text-[10px] tracking-widest mt-1.5">
-                      Accuracy
-                    </span>
+            {/* AnimatePresence swaps the contents seamlessly */}
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={activeProject.id}
+                initial={{ opacity: 0, y: 15 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -15 }}
+                transition={{ duration: 0.3 }}
+                className="flex-1 flex flex-col justify-between gap-4"
+              >
+                <div>
+                  {/* Title & Tech stack */}
+                  <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mb-4">
+                    {activeProject.tech.map((t) => (
+                      <span key={t} className="font-mono text-[#e04e00] text-[10px] tracking-widest uppercase font-bold">
+                        #{t}
+                      </span>
+                    ))}
                   </div>
-                  <div className="flex flex-col pr-4 border-r border-indigo-500/10">
-                    <span className="leading-none font-sans font-extrabold text-slate-100 text-2xl sm:text-3xl">
-                      &lt;300ms
-                    </span>
-                    <span className="font-mono uppercase text-slate-500 text-[10px] tracking-widest mt-1.5">
-                      Latency
-                    </span>
+
+                  <p className="font-geist text-slate-400 text-sm leading-relaxed font-semibold mb-6">
+                    {activeProject.description}
+                  </p>
+
+                  {/* Dynamic Metrics Cards */}
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+                    {activeProject.metrics.map((m, idx) => (
+                      <div key={idx} className="border border-white/10 p-4 bg-white/[0.02] text-left">
+                        <span className="font-serif font-extrabold text-white text-lg sm:text-xl block leading-tight">
+                          {m.value}
+                        </span>
+                        <span className="font-mono uppercase text-slate-500 text-[8px] tracking-widest mt-1.5 block font-bold">
+                          {m.label}
+                        </span>
+                      </div>
+                    ))}
                   </div>
-                  <div className="flex flex-col pr-4 border-r border-indigo-500/10">
-                    <span className="leading-none font-sans font-extrabold text-slate-100 text-2xl sm:text-3xl">
-                      350K+
-                    </span>
-                    <span className="font-mono uppercase text-slate-500 text-[10px] tracking-widest mt-1.5">
-                      Records
-                    </span>
-                  </div>
-                  <div className="flex flex-col">
-                    <span className="leading-none font-sans font-extrabold text-slate-100 text-2xl sm:text-3xl text-[#22D3A5]">
-                      15s
-                    </span>
-                    <span className="font-mono uppercase text-slate-500 text-[10px] tracking-widest mt-1.5">
-                      Alert Time
-                    </span>
+
+                  {/* Dynamic Bullet highlights */}
+                  <div className="flex flex-col gap-3.5 border-t border-white/10 pt-6">
+                    {activeProject.highlights.map((h, i) => (
+                      <div key={i} className="flex items-start gap-2.5 text-left">
+                        <span className="font-mono text-[#e04e00] text-xs font-bold mt-0.5 select-none">→</span>
+                        <p className="font-geist text-slate-400 text-xs sm:text-sm leading-relaxed font-medium">
+                          {h}
+                        </p>
+                      </div>
+                    ))}
                   </div>
                 </div>
 
-                <div className="flex flex-wrap mt-10 items-center gap-6">
+                {/* Footer action */}
+                <div className="flex justify-between items-center border-t border-white/15 pt-6 mt-6">
                   <a
-                    href="https://github.com/KhawajaFashi"
+                    href={activeProject.github}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="group inline-flex transition-colors font-mono text-slate-400 hover:text-slate-200 text-sm items-center gap-2"
+                    className="group inline-flex items-center gap-2 font-mono text-[10px] tracking-widest uppercase font-bold text-slate-300 hover:text-white"
                   >
-                    View on GitHub
-                    <ArrowUpRight className="size-4 text-indigo-500" />
+                    <svg className="size-4 text-[#e04e00]" fill="currentColor" viewBox="0 0 24 24">
+                      <path fillRule="evenodd" clipRule="evenodd" d="M12 2C6.477 2 2 6.477 2 12c0 4.42 2.865 8.166 6.839 9.489.5.092.682-.217.682-.482 0-.237-.008-.866-.013-1.7-2.782.603-3.369-1.34-3.369-1.34-.454-1.156-1.11-1.464-1.11-1.464-.908-.62.069-.608.069-.608 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.087 2.91.831.092-.646.35-1.086.636-1.336-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.269 2.75 1.025A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.294 2.747-1.025 2.747-1.025.546 1.377.203 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.743 0 .267.18.579.688.481C19.137 20.164 22 16.418 22 12c0-5.523-4.477-10-10-10z" />
+                    </svg>
+                    Source Repository
+                    <ArrowUpRight className="size-3 text-[#e04e00]" />
                   </a>
+                  <span className="font-mono text-slate-600 text-[10px] font-bold">
+                    0{activeIndex + 1} / 03
+                  </span>
                 </div>
-              </div>
-
-              {/* Right Columns: Interactive Network Simulator Widget */}
-              <div className="relative bg-gray-900/40 border-t lg:border-t-0 lg:border-l border-indigo-500/20 p-6 sm:p-10 flex flex-col justify-between">
-                <IoTWidget />
-              </div>
-
-            </div>
-          </div>
-        </div>
-
-        {/* Selected selected works grid - Two column for HypeWait & LiveTeamGames */}
-        <div className="relative z-10 grid grid-cols-1 lg:grid-cols-2 gap-8 items-stretch">
-          
-          {/* Card 1: HypeWait PoW Queue */}
-          <div className="relative shadow-[0_20px_40px_-15px_rgba(0,0,0,0.8)] rounded-2xl bg-[#0D1117]/80 backdrop-blur-md border border-indigo-500/20 overflow-hidden flex flex-col justify-between p-6 sm:p-8">
-            <div className="bg-gradient-to-r from-transparent via-[#6366F1]/40 to-transparent absolute inset-x-0 top-0 h-px" />
-            
-            <div className="flex flex-col mb-8">
-              <div className="flex items-center gap-3">
-                <span className="font-mono font-bold uppercase text-[#22D3A5] text-[10px] tracking-[3px]">
-                  Virtual Queue Drops
-                </span>
-                <div className="bg-indigo-500/10 flex-1 h-px" />
-                <span className="font-mono text-slate-500 text-[10px]">
-                  2025
-                </span>
-              </div>
-
-              <h4 className="font-sans font-bold text-slate-100 text-2xl sm:text-3xl mt-4">
-                HypeWait Queue Drops
-              </h4>
-
-              <p className="font-mono text-xs tracking-wide mt-2 text-[#22D3A5] flex gap-2">
-                <span>Node.js</span> <span>·</span>
-                <span>Redis</span> <span>·</span>
-                <span>WebSocket</span> <span>·</span>
-                <span>JWT</span>
-              </p>
-
-              <p className="leading-relaxed text-slate-400 text-sm mt-4">
-                Hash-based Proof-of-Work virtual queue system for high-demand product drops. Admission controlled by client-side PoW computation, preventing bot flooding without CAPTCHAs.
-              </p>
-            </div>
-
-            {/* Embed Queue Widget */}
-            <div className="bg-gray-900/30 rounded-xl border border-indigo-500/10 p-5 mt-auto">
-              <HypeWaitWidget />
-            </div>
-          </div>
-
-          {/* Card 2: LiveTeamGames Coordinates */}
-          <div className="relative shadow-[0_20px_40px_-15px_rgba(0,0,0,0.8)] rounded-2xl bg-[#0D1117]/80 backdrop-blur-md border border-indigo-500/20 overflow-hidden flex flex-col justify-between p-6 sm:p-8">
-            <div className="bg-gradient-to-r from-transparent via-[#6366F1]/40 to-transparent absolute inset-x-0 top-0 h-px" />
-            
-            <div className="flex flex-col mb-8">
-              <div className="flex items-center gap-3">
-                <span className="font-mono font-bold uppercase text-[#22D3A5] text-[10px] tracking-[3px]">
-                  Multiplayer Coordination
-                </span>
-                <div className="bg-indigo-500/10 flex-1 h-px" />
-                <span className="font-mono text-slate-500 text-[10px]">
-                  2025
-                </span>
-              </div>
-
-              <h4 className="font-sans font-bold text-slate-100 text-2xl sm:text-3xl mt-4">
-                LiveTeamGames Grid
-              </h4>
-
-              <p className="font-mono text-xs tracking-wide mt-2 text-[#22D3A5] flex gap-2">
-                <span>Node.js</span> <span>·</span>
-                <span>PostgreSQL</span> <span>·</span>
-                <span>WebSocket</span> <span>·</span>
-                <span>REST API</span>
-              </p>
-
-              <p className="leading-relaxed text-slate-400 text-sm mt-4">
-                Real-time coordination platform with server-side coordinate tracking, team state management, and a live map-grid interface for match event visualization.
-              </p>
-            </div>
-
-            {/* Embed Grid Widget */}
-            <div className="bg-gray-900/30 rounded-xl border border-indigo-500/10 p-5 mt-auto">
-              <LiveTeamGamesWidget />
-            </div>
+              </motion.div>
+            </AnimatePresence>
           </div>
 
         </div>
 
       </div>
-    </section>
+    </div>
   );
 }

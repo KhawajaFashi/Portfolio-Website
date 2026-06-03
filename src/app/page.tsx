@@ -18,7 +18,7 @@ const sectionVariants = {
 
 export default function Page() {
   return (
-    <div className="bg-[#080B12] text-slate-100 min-h-screen">
+    <div className="bg-[#f9f9f9] text-black min-h-screen">
       <motion.div
         initial="hidden"
         whileInView="visible"

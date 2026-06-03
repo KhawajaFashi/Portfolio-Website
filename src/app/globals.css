@@ -73,24 +73,24 @@
   height: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: #080B12;
+  background: #f9f9f9;
 }
 ::-webkit-scrollbar-thumb {
-  background: rgba(99, 102, 241, 0.2);
+  background: rgba(0, 0, 0, 0.15);
   border-radius: 3px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(99, 102, 241, 0.4);
+  background: rgba(0, 0, 0, 0.3);
 }
 
 html {
   scroll-behavior: smooth;
-  background-color: #080B12;
+  background-color: #f9f9f9;
 }
 
 body {
-  background-color: #080B12;
-  color: #f1f5f9;
+  background-color: #f9f9f9;
+  color: #1a1c1c;
   overflow-x: hidden;
 }
 
@@ -100,6 +100,18 @@ body {
 }
 .font-mono {
   font-family: var(--font-jetbrains-mono), monospace;
+}
+.font-serif {
+  font-family: var(--font-playfair), Georgia, serif;
+}
+.font-geist {
+  font-family: var(--font-geist), sans-serif;
+}
+
+/* Architectural vertical 12-column grid line overlay */
+.bg-grid-lines {
+  background-image: linear-gradient(to right, rgba(0, 0, 0, 0.04) 1px, transparent 1px);
+  background-size: 8.333333% 100%;
 }
 
 /* Custom radial overlays and scan animations for high-tech premium aesthetics */
