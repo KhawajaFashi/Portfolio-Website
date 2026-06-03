@@ -14,7 +14,7 @@ export default function Experience() {
         {/* Card 1: Full-Time Role (Sticky Z-10, Black Background, White Text) */}
         <div 
           id="experience"
-          className="sticky top-0 w-full h-screen bg-black text-white flex flex-col justify-center px-6 sm:px-12 z-10 border-b border-black/5"
+          className="sticky top-0 w-full h-screen bg-black text-white flex flex-col justify-center px-6 sm:px-12 z-10 border-b border-black/5 overflow-y-auto"
         >
           {/* Decorative vertical columns overlay */}
           <div className="absolute inset-0 pointer-events-none flex justify-between max-w-[1240px] mx-auto w-full px-6 sm:px-12 z-0">
@@ -90,7 +90,7 @@ export default function Experience() {
         {/* Card 2: Intern Role (Sticky Z-20, Light Background, Black Text) */}
         <div 
           id="experience-light"
-          className="sticky top-0 w-full h-screen bg-[#f9f9f9] text-black flex flex-col justify-center px-6 sm:px-12 z-20"
+          className="sticky top-0 w-full h-screen bg-[#f9f9f9] text-black flex flex-col justify-center max-[380px]:py-16 px-6 sm:px-12 z-20 overflow-y-auto"
         >
           {/* Decorative vertical columns overlay */}
           <div className="absolute inset-0 pointer-events-none flex justify-between max-w-[1240px] mx-auto w-full px-6 sm:px-12 z-0">
